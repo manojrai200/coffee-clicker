@@ -116,21 +116,16 @@ function updatePrice(oldPrice) {
 
 function attemptToBuyProducer(data, producerId) {
   // your code here
-  let arrayOFProducer = data.producers;
-  for(let obj of arrayOFProducer){
-    if(obj.id === producerId){
-      if(canAffordProducer(data, producerId)){
-        obj.qty++;
-        data.coffee -= obj.price;
-        obj.price = updatePrice(obj.price);
-        data.totalCPS += obj.cps;
+  if (canAffordProducer(data, producerId)) {
+    let producer = getProducerById(data, producerId);
 
-        return true
-      }else {
-        return false
-      }
-    }
-  }
+    producer.qty += 1;
+    data.coffee -= producer.price;
+    producer.price = updatePrice(producer.price);
+    data.totalCPS += producer.cps;
+
+    return true;
+  } else return false;
 }
 
 function buyButtonClick(event, data) {
