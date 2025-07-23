@@ -3,6 +3,19 @@
 /**************
  *   SLICE 1
  **************/
+function saveGame(data) {
+  localStorage.setItem('coffeeGameData', JSON.stringify(data));
+}
+
+function loadGame() {
+  const savedData = localStorage.getItem('coffeeGameData');
+  if (savedData) {
+    return JSON.parse(savedData);
+  } else {
+    return window.data;
+  }
+}
+
 
 function updateCoffeeView(coffeeQty) {
   // your code here
@@ -10,10 +23,10 @@ function updateCoffeeView(coffeeQty) {
 }
 
 function clickCoffee(data) {
-  // your code here
-   data.coffee += 1;
+  data.coffee += 1;
   updateCoffeeView(data.coffee);
   renderProducers(data);
+  saveGame(data); // Save after click
 }
 
 /**************
@@ -115,18 +128,23 @@ function updatePrice(oldPrice) {
 }
 
 function attemptToBuyProducer(data, producerId) {
-  // your code here
-  if (canAffordProducer(data, producerId)) {
-    let producer = getProducerById(data, producerId);
-
-    producer.qty += 1;
-    data.coffee -= producer.price;
-    producer.price = updatePrice(producer.price);
-    data.totalCPS += producer.cps;
-
-    return true;
-  } else return false;
+  let arrayOFProducer = data.producers;
+  for (let obj of arrayOFProducer) {
+    if (obj.id === producerId) {
+      if (canAffordProducer(data, producerId)) {
+        obj.qty++;
+        data.coffee -= obj.price;
+        obj.price = updatePrice(obj.price);
+        data.totalCPS += obj.cps;
+        saveGame(data); // Save after purchase
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
 }
+
 
 function buyButtonClick(event, data) {
   // your code here
@@ -143,10 +161,10 @@ function buyButtonClick(event, data) {
 }
 
 function tick(data) {
-  // your code here
   data.coffee += data.totalCPS;
   updateCoffeeView(data.coffee);
-  renderProducers(data)
+  renderProducers(data);
+  saveGame(data); // Save every tick
 }
 
 
@@ -168,7 +186,7 @@ function tick(data) {
 if (typeof process === 'undefined') {
   // Get starting data from the window object
   // (This comes from data.js)
-  const data = window.data;
+  const data = loadGame();
 
   // Add an event listener to the giant coffee emoji
   const bigCoffee = document.getElementById('big_coffee');
