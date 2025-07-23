@@ -6,10 +6,14 @@
 
 function updateCoffeeView(coffeeQty) {
   // your code here
+  document.getElementById('coffee_counter').innerText = coffeeQty;
 }
 
 function clickCoffee(data) {
   // your code here
+   data.coffee += 1;
+  updateCoffeeView(data.coffee);
+  renderProducers(data);
 }
 
 /**************
@@ -18,14 +22,23 @@ function clickCoffee(data) {
 
 function unlockProducers(producers, coffeeCount) {
   // your code here
+  for(let item in producers){
+    if(producers[item].price / 2 <= coffeeCount){
+      producers[item].unlocked = true;
+    }
+  }
 }
 
 function getUnlockedProducers(data) {
   // your code here
+  return data.producers.filter((producer) => producer.unlocked)
 }
 
 function makeDisplayNameFromId(id) {
   // your code here
+  return id.split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 // You shouldn't need to edit this function-- its tests should pass once you've written makeDisplayNameFromId
@@ -51,10 +64,20 @@ function makeProducerDiv(producer) {
 
 function deleteAllChildNodes(parent) {
   // your code here
+  while (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  }
 }
 
 function renderProducers(data) {
   // your code here
+  const producerContainer = document.getElementById('producer_container');
+  deleteAllChildNodes(producerContainer)
+  unlockProducers(data.producers, data.coffee);
+  getUnlockedProducers(data).forEach(producer => {
+    producerContainer.appendChild(makeProducerDiv(producer))
+  });;
+
 }
 
 /**************
@@ -63,30 +86,70 @@ function renderProducers(data) {
 
 function getProducerById(data, producerId) {
   // your code here
+  let arrayOFProducer = data.producers;
+  for(let obj of arrayOFProducer){
+    if(obj.id === producerId) return obj;
+  }
 }
 
 function canAffordProducer(data, producerId) {
   // your code here
+  let arrayOFProducer = data.producers;
+  for(let obj of arrayOFProducer){
+    if(obj.id === producerId){
+      return obj.price <= data.coffee;
+    }
+  }
 }
 
 function updateCPSView(cps) {
   // your code here
+  const cpsIndicator = document.getElementById('cps');
+  cpsIndicator.innerText = cps;
+
 }
 
 function updatePrice(oldPrice) {
   // your code here
+  return Math.floor(oldPrice * 1.25);
 }
 
 function attemptToBuyProducer(data, producerId) {
   // your code here
+  let arrayOFProducer = data.producers;
+  for(let obj of arrayOFProducer){
+    if(obj.id === producerId){
+      if(canAffordProducer(data, producerId)){
+        obj.qty++;
+        data.coffee -= obj.price;
+        obj.price = updatePrice(obj.price);
+        data.totalCPS += obj.cps;
+
+        return true
+      }else {
+        return false
+      }
+    }
+  }
 }
 
 function buyButtonClick(event, data) {
   // your code here
+  if (event.target.tagName === 'BUTTON') {
+    const producerId = event.target.id.split('buy_')[1];
+
+    if (attemptToBuyProducer(data, producerId)) {
+      updateCoffeeView(data.coffee);
+      updateCPSView(data.totalCPS);
+      renderProducers(data);
+    } else window.alert('Not enough coffee!');
+  }
+
 }
 
 function tick(data) {
   // your code here
+  
 }
 
 /*************************
