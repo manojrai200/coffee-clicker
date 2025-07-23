@@ -152,7 +152,6 @@ function tick(data) {
   data.coffee += data.totalCPS;
   updateCoffeeView(data.coffee);
   renderProducers(data)
-
 }
 
 /*************************
