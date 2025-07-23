@@ -31,7 +31,7 @@ function unlockProducers(producers, coffeeCount) {
 
 function getUnlockedProducers(data) {
   // your code here
-  return data.producers.filter((producer) => producer.unlocked)
+  return data.producers.filter((producer) => producer.unlocked === true)
 }
 
 function makeDisplayNameFromId(id) {
